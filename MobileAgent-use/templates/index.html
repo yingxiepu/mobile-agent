@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MobileAgent 控制面板</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #1E88E5;
+            --primary-dark: #1565C0;
+            --secondary-color: #7E57C2;
+            --accent-color: #00E5FF;
+            --dark-bg: #121212;
+            --medium-bg: #1E1E1E;
+            --light-bg: #2D2D2D;
+            --text-color: #E0E0E0;
+            --border-glow: 0 0 10px var(--accent-color);
+            --border-radius: 12px;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(30, 136, 229, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 229, 255, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+        
+        .navbar {
+            background-color: var(--medium-bg) !important;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            color: var(--accent-color) !important;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+        
+        .nav-link {
+            color: var(--text-color) !important;
+            margin: 0 5px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--accent-color) !important;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        
+        .card {
+            background-color: var(--light-bg);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), var(--border-glow);
+            border-color: var(--accent-color);
+        }
+        
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 15px 20px;
+            border-top-left-radius: var(--border-radius) !important;
+            border-top-right-radius: var(--border-radius) !important;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            color: var(--accent-color);
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .btn {
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            left: 0;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 15px rgba(30, 136, 229, 0.5);
+        }
+        
+        .btn-success {
+            background-color: #26A69A;
+            border-color: #26A69A;
+        }
+        
+        .btn-success:hover {
+            background-color: #00897B;
+            border-color: #00897B;
+            box-shadow: 0 0 15px rgba(38, 166, 154, 0.5);
+        }
+        
+        .btn-danger {
+            background-color: #EF5350;
+            border-color: #EF5350;
+        }
+        
+        .btn-danger:hover {
+            background-color: #E53935;
+            border-color: #E53935;
+            box-shadow: 0 0 15px rgba(239, 83, 80, 0.5);
+        }
+        
+        .list-group-item {
+            background-color: var(--light-bg);
+            border-color: rgba(0, 229, 255, 0.1);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        
+        .list-group-item:hover {
+            background-color: rgba(0, 229, 255, 0.05);
+        }
+        
+        #statusPanel, #output {
+            background-color: #1A1A1A;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: var(--border-radius);
+            color: #E0E0E0;
+            font-family: 'Consolas', 'Courier New', monospace;
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            white-space: pre-wrap;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .terminal-line {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+        
+        .terminal-line::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+        
+        .neon-text {
+            color: var(--accent-color);
+            text-shadow: 0 0 5px var(--accent-color), 
+                         0 0 10px var(--accent-color), 
+                         0 0 20px var(--accent-color);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 229, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-phone"></i> MobileAgent<span class="neon-text">OS</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('index') }}">主控台</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('config_page') }}">系统配置</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-terminal"></i> 控制面板</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5 class="neon-text mb-3">指令模式</h5>
+                            <p class="text-light">当前指令: <span class="fst-italic">{{ config.instruction }}</span></p>
+                            <div class="d-flex justify-content-between">
+                                <button id="startRecord" class="btn btn-success"><i class="bi bi-record-circle"></i> 执行并记录操作</button>
+                                <button id="stopBtn" class="btn btn-danger" disabled><i class="bi bi-stop-circle"></i> 停止执行</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h5 class="neon-text mb-3">重放模式</h5>
+                            <select id="logSelect" class="form-select mb-3" style="background-color: var(--light-bg); color: var(--text-color); border-color: rgba(0, 229, 255, 0.2);">
+                                <option value="">选择操作日志...</option>
+                                {% for log in logs %}
+                                    <option value="{{ log.path }}">{{ log.name }} ({{ log.modified }}, {{ log.size }})</option>
+                                {% endfor %}
+                            </select>
+                            <button id="startReplay" class="btn btn-primary" disabled><i class="bi bi-play-circle"></i> 重放所选操作</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-file-code"></i> 操作日志</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if logs %}
+                            <div class="list-group">
+                                {% for log in logs %}
+                                    <a href="{{ url_for('view_log', log_path=log.path) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="bi bi-file-earmark-text"></i> {{ log.name }}
+                                            <small class="text-muted ms-2">{{ log.modified }}</small>
+                                        </div>
+                                        <span class="badge bg-info">{{ log.size }}</span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">暂无操作日志</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-broadcast"></i> 系统状态</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="statusPanel">
+                            <div class="terminal-line">系统初始化完成</div>
+                            <div class="terminal-line neon-text">MobileAgentOS v2.0 已启动</div>
+                            <div class="terminal-line">等待指令...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-terminal"></i> 执行输出</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="output"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 启用/禁用按钮状态
+            function updateButtons(isRunning) {
+                $("#startRecord").prop("disabled", isRunning);
+                $("#startReplay").prop("disabled", isRunning || !$("#logSelect").val());
+                $("#stopBtn").prop("disabled", !isRunning);
+            }
+            
+            // 日志选择变化
+            $("#logSelect").change(function() {
+                $("#startReplay").prop("disabled", !$(this).val() || $("#stopBtn").prop("disabled") === false);
+            });
+            
+            // 启动记录模式
+            $("#startRecord").click(function() {
+                $.ajax({
+                    url: "/start_record",
+                    method: "POST",
+                    success: function(response) {
+                        if (response.success) {
+                            updateButtons(true);
+                            $("#statusPanel").append('<div class="terminal-line">开始执行并记录操作...</div>');
+                            $("#statusPanel").scrollTop($("#statusPanel")[0].scrollHeight);
+                            // 开始轮询状态
+                            pollStatus();
+                        } else {
+                            alert("启动失败: " + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert("网络错误，请重试");
+                    }
+                });
+            });
+            
+            // 启动重放模式
+            $("#startReplay").click(function() {
+                const logFile = $("#logSelect").val();
+                if (!logFile) {
+                    alert("请选择要重放的操作日志");
+                    return;
+                }
+                
+                $.ajax({
+                    url: "/start_replay",
+                    method: "POST",
+                    data: { log_file: logFile },
+                    success: function(response) {
+                        if (response.success) {
+                            updateButtons(true);
+                            $("#statusPanel").append('<div class="terminal-line">开始重放操作...</div>');
+                            $("#statusPanel").scrollTop($("#statusPanel")[0].scrollHeight);
+                            // 开始轮询状态
+                            pollStatus();
+                        } else {
+                            alert("启动失败: " + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert("网络错误，请重试");
+                    }
+                });
+            });
+            
+            // 停止按钮
+            $("#stopBtn").click(function() {
+                $.ajax({
+                    url: "/stop",
+                    method: "POST",
+                    success: function(response) {
+                        if (response.success) {
+                            updateButtons(false);
+                            $("#statusPanel").append('<div class="terminal-line neon-text">操作已停止</div>');
+                            $("#statusPanel").scrollTop($("#statusPanel")[0].scrollHeight);
+                        } else {
+                            alert("停止失败: " + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert("网络错误，请重试");
+                    }
+                });
+            });
+            
+            let lastOutputLength = 0;
+            
+            // 轮询状态
+            function pollStatus() {
+                $.ajax({
+                    url: "/status",
+                    method: "GET",
+                    success: function(response) {
+                        if (response.output.length > lastOutputLength) {
+                            for (let i = lastOutputLength; i < response.output.length; i++) {
+                                $("#output").append(response.output[i] + "\n");
+                            }
+                            lastOutputLength = response.output.length;
+                            $("#output").scrollTop($("#output")[0].scrollHeight);
+                        }
+                        
+                        if (response.is_running) {
+                            // 继续轮询
+                            setTimeout(pollStatus, 1000);
+                        } else {
+                            updateButtons(false);
+                            $("#statusPanel").append('<div class="terminal-line neon-text">执行完成</div>');
+                            $("#statusPanel").scrollTop($("#statusPanel")[0].scrollHeight);
+                            // 刷新页面以更新日志列表
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 2000);
+                        }
+                    },
+                    error: function() {
+                        console.error("获取状态失败，将重试");
+                        // 出错时仍然继续轮询
+                        setTimeout(pollStatus, 2000);
+                    }
+                });
+            }
+            
+            // 如果当前有任务在运行，立即开始轮询
+            {% if run_status.is_running %}
+                updateButtons(true);
+                pollStatus();
+            {% endif %}
+        });
+    </script>
+</body>
+</html> 

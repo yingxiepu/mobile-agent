@@ -1,0 +1,15 @@
+{
+  "adb_path": "D:/安卓逆向工具/adb/platform-tools/adb.exe",
+  "instruction": "查看浏览器，看看今天有什么新闻，然后就是在搜索163邮箱 我要登陆邮箱账号123456@163.com 密码是123",
+  "API_url": "https://api.openai.com/v1/chat/completions",
+  "token": "",
+  "caption_call_method": "api",
+  "caption_model": "qwen-vl-plus",
+  "qwen_api": "",
+  "add_info": "在手机主屏幕上找到应用图标，轻触即可打开应用（适用于iOS和安卓设备）\r\n若图标不在主屏幕，可滑动进入“应用抽屉”（安卓）或通过屏幕边缘滑动呼出搜索栏查找。\r\n",
+  "reflection_switch": true,
+  "memory_switch": true,
+  "record_operations": true,
+  "operations_log_file": "operations_log.json",
+  "replay_mode": false
+}

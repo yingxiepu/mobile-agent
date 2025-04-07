@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>操作日志详情 - MobileAgent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #1E88E5;
+            --primary-dark: #1565C0;
+            --secondary-color: #7E57C2;
+            --accent-color: #00E5FF;
+            --dark-bg: #121212;
+            --medium-bg: #1E1E1E;
+            --light-bg: #2D2D2D;
+            --text-color: #E0E0E0;
+            --border-glow: 0 0 10px var(--accent-color);
+            --border-radius: 12px;
+            --success-color: #26A69A;
+            --primary-color: #1E88E5;
+            --warning-color: #FF9800;
+            --danger-color: #EF5350;
+            --purple-color: #6610f2;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(30, 136, 229, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 229, 255, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+        
+        .navbar {
+            background-color: var(--medium-bg) !important;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            color: var(--accent-color) !important;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+        
+        .nav-link {
+            color: var(--text-color) !important;
+            margin: 0 5px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--accent-color) !important;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        
+        .card {
+            background-color: var(--light-bg);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), var(--border-glow);
+            border-color: var(--accent-color);
+        }
+        
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 15px 20px;
+            border-top-left-radius: var(--border-radius) !important;
+            border-top-right-radius: var(--border-radius) !important;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            color: var(--accent-color);
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .btn {
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            left: 0;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 15px rgba(30, 136, 229, 0.5);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #00897B;
+            border-color: #00897B;
+            box-shadow: 0 0 15px rgba(38, 166, 154, 0.5);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #E53935;
+            border-color: #E53935;
+            box-shadow: 0 0 15px rgba(239, 83, 80, 0.5);
+        }
+        
+        .neon-text {
+            color: var(--accent-color);
+            text-shadow: 0 0 5px var(--accent-color), 
+                         0 0 10px var(--accent-color), 
+                         0 0 20px var(--accent-color);
+        }
+        
+        /* Timeline styling */
+        .timeline {
+            position: relative;
+            padding-left: 50px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(0, 229, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -40px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: 3px solid #1A1A1A;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+            z-index: 2;
+        }
+        
+        .timeline-item.tap-action::before {
+            background: var(--success-color);
+            box-shadow: 0 0 10px rgba(38, 166, 154, 0.8);
+        }
+        
+        .timeline-item.swipe-action::before {
+            background: var(--primary-color);
+            box-shadow: 0 0 10px rgba(30, 136, 229, 0.8);
+        }
+        
+        .timeline-item.type-action::before {
+            background: var(--purple-color);
+            box-shadow: 0 0 10px rgba(102, 16, 242, 0.8);
+        }
+        
+        .timeline-item.open-app-action::before {
+            background: var(--warning-color);
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.8);
+        }
+        
+        .timeline-item.back-action::before, .timeline-item.home-action::before {
+            background: var(--danger-color);
+            box-shadow: 0 0 10px rgba(239, 83, 80, 0.8);
+        }
+        
+        .action-card {
+            transition: transform 0.2s, box-shadow 0.3s;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            overflow: hidden;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 229, 255, 0.3);
+        }
+        
+        .action-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Phone screen styling */
+        .phone-screen {
+            width: 300px;
+            height: 600px;
+            background-color: #000;
+            border: 10px solid #333;
+            border-radius: 30px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0, 229, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .phone-screen:before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 15px;
+            background-color: #222;
+            border-radius: 0 0 15px 15px;
+            z-index: 2;
+        }
+        
+        .tap-point {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(38, 166, 154, 0.2);
+            border: 2px solid var(--success-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px rgba(38, 166, 154, 0.8);
+            animation: pulse 2s infinite;
+        }
+        
+        .swipe-line {
+            position: absolute;
+            background-color: rgba(30, 136, 229, 0.2);
+            border: 2px solid var(--primary-color);
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(30, 136, 229, 0.6);
+        }
+        
+        .swipe-arrow {
+            position: absolute;
+            width: 0; 
+            height: 0; 
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-bottom: 18px solid var(--primary-color);
+            transform: translate(-50%, -50%);
+            z-index: 11;
+            filter: drop-shadow(0 0 5px rgba(30, 136, 229, 0.8));
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(38, 166, 154, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(38, 166, 154, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(38, 166, 154, 0); }
+        }
+        
+        .list-group-item {
+            background-color: var(--medium-bg);
+            border-color: rgba(0, 229, 255, 0.1);
+            color: var(--text-color);
+        }
+        
+        .list-group-item:hover {
+            background-color: rgba(0, 229, 255, 0.05);
+        }
+        
+        .form-control, .form-select {
+            background-color: var(--medium-bg);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: var(--text-color);
+            border-radius: var(--border-radius);
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(0, 229, 255, 0.05);
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            box-shadow: 0 0 0 0.25rem rgba(0, 229, 255, 0.25);
+        }
+        
+        .form-label {
+            color: var(--text-color);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .btn-outline-primary {
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+        }
+        
+        .badge {
+            padding: 0.5em 0.8em;
+            border-radius: 8px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-success {
+            background-color: var(--success-color);
+        }
+        
+        .badge-primary {
+            background-color: var(--primary-color);
+        }
+        
+        .badge-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .badge-purple {
+            background-color: var(--purple-color);
+        }
+        
+        .badge-warning {
+            background-color: var(--warning-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-phone"></i> MobileAgent<span class="neon-text">OS</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">主控台</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('config_page') }}">系统配置</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="neon-text"><i class="bi bi-list-check"></i> 操作日志: {{ log_name }}</h2>
+            <div>
+                <button id="replayBtn" class="btn btn-success">
+                    <i class="bi bi-play-fill"></i> 重放此操作记录
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary" style="border-color: rgba(255,255,255,0.2); color: var(--text-color);">
+                    <i class="bi bi-arrow-left"></i> 返回
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> 操作时间线</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            {% for operation in log_data %}
+                                {% set action_type = operation.action_type.lower() %}
+                                {% set action_class = action_type + '-action' %}
+                                
+                                <div class="timeline-item {{ action_class }}" id="operation-{{ loop.index }}">
+                                    <div class="card action-card">
+                                        <div class="card-body">
+                                            <div class="d-flex">
+                                                {% if action_type == 'tap' %}
+                                                    <div class="action-icon bg-success me-3">
+                                                        <i class="bi bi-hand-index-thumb"></i>
+                                                    </div>
+                                                {% elif action_type == 'swipe' %}
+                                                    <div class="action-icon bg-primary me-3">
+                                                        <i class="bi bi-arrows-move"></i>
+                                                    </div>
+                                                {% elif action_type == 'type' %}
+                                                    <div class="action-icon bg-purple me-3" style="background-color: #6610f2;">
+                                                        <i class="bi bi-keyboard"></i>
+                                                    </div>
+                                                {% elif action_type == 'back' %}
+                                                    <div class="action-icon bg-danger me-3">
+                                                        <i class="bi bi-arrow-return-left"></i>
+                                                    </div>
+                                                {% elif action_type == 'home' %}
+                                                    <div class="action-icon bg-danger me-3">
+                                                        <i class="bi bi-house"></i>
+                                                    </div>
+                                                {% elif action_type == 'open app' %}
+                                                    <div class="action-icon bg-warning me-3" style="background-color: #fd7e14;">
+                                                        <i class="bi bi-app"></i>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="action-icon bg-secondary me-3">
+                                                        <i class="bi bi-question"></i>
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex justify-content-between">
+                                                        <h5 class="card-title mb-1">{{ operation.action_type }}</h5>
+                                                        <div>
+                                                            <button class="btn btn-sm btn-outline-primary edit-action" data-action-index="{{ loop.index0 }}">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <h6 class="card-subtitle mb-2 text-muted">{{ operation.timestamp }}</h6>
+                                                    
+                                                    {% if operation.params %}
+                                                        <div class="mt-2" id="params-display-{{ loop.index0 }}">
+                                                            {% if action_type == 'tap' %}
+                                                                <p>坐标: ({{ operation.params.x }}, {{ operation.params.y }})</p>
+                                                                <button class="btn btn-sm btn-outline-success show-action" 
+                                                                        data-action-type="{{ action_type }}" 
+                                                                        data-x="{{ operation.params.x }}" 
+                                                                        data-y="{{ operation.params.y }}">
+                                                                    <i class="bi bi-eye"></i> 在屏幕上显示
+                                                                </button>
+                                                            {% elif action_type == 'swipe' %}
+                                                                <p>起点: ({{ operation.params.start_x }}, {{ operation.params.start_y }})</p>
+                                                                <p>终点: ({{ operation.params.end_x }}, {{ operation.params.end_y }})</p>
+                                                                <button class="btn btn-sm btn-outline-primary show-action" 
+                                                                        data-action-type="{{ action_type }}" 
+                                                                        data-start-x="{{ operation.params.start_x }}" 
+                                                                        data-start-y="{{ operation.params.start_y }}"
+                                                                        data-end-x="{{ operation.params.end_x }}" 
+                                                                        data-end-y="{{ operation.params.end_y }}">
+                                                                    <i class="bi bi-eye"></i> 在屏幕上显示
+                                                                </button>
+                                                            {% elif action_type == 'type' %}
+                                                                <p>输入文本: "{{ operation.params.text }}"</p>
+                                                            {% elif action_type == 'open app' %}
+                                                                <p>打开应用: {{ operation.params.app_name }}</p>
+                                                                <p>点击坐标: ({{ operation.params.x }}, {{ operation.params.y }})</p>
+                                                            {% endif %}
+                                                        </div>
+                                                        
+                                                        <div class="mt-2 d-none" id="params-edit-{{ loop.index0 }}">
+                                                            {% if action_type == 'tap' %}
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">X 坐标:</label>
+                                                                    <input type="number" class="form-control param-value" data-param="x" value="{{ operation.params.x }}">
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">Y 坐标:</label>
+                                                                    <input type="number" class="form-control param-value" data-param="y" value="{{ operation.params.y }}">
+                                                                </div>
+                                                            {% elif action_type == 'swipe' %}
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">起始 X 坐标:</label>
+                                                                    <input type="number" class="form-control param-value" data-param="start_x" value="{{ operation.params.start_x }}">
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">起始 Y 坐标:</label>
+                                                                    <input type="number" class="form-control param-value" data-param="start_y" value="{{ operation.params.start_y }}">
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">结束 X 坐标:</label>
+                                                                    <input type="number" class="form-control param-value" data-param="end_x" value="{{ operation.params.end_x }}">
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">结束 Y 坐标:</label>
+                                                                    <input type="number" class="form-control param-value" data-param="end_y" value="{{ operation.params.end_y }}">
+                                                                </div>
+                                                            {% elif action_type == 'type' %}
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">输入文本:</label>
+                                                                    <input type="text" class="form-control param-value" data-param="text" value="{{ operation.params.text }}">
+                                                                </div>
+                                                            {% elif action_type == 'open app' %}
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">应用名称:</label>
+                                                                    <input type="text" class="form-control param-value" data-param="app_name" value="{{ operation.params.app_name }}">
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">X 坐标:</label>
+                                                                    <input type="number" class="form-control param-value" data-param="x" value="{{ operation.params.x }}">
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">Y 坐标:</label>
+                                                                    <input type="number" class="form-control param-value" data-param="y" value="{{ operation.params.y }}">
+                                                                </div>
+                                                            {% endif %}
+                                                            
+                                                            <div class="mt-3 d-flex">
+                                                                <button class="btn btn-sm btn-success me-2 save-params" data-action-index="{{ loop.index0 }}">
+                                                                    <i class="bi bi-check-lg"></i> 保存
+                                                                </button>
+                                                                <button class="btn btn-sm btn-outline-secondary cancel-edit" data-action-index="{{ loop.index0 }}">
+                                                                    <i class="bi bi-x-lg"></i> 取消
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-tools"></i> 日志操作</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button id="saveChangesBtn" class="btn btn-success">
+                                <i class="bi bi-save"></i> 保存所有修改
+                            </button>
+                            <button id="exportJsonBtn" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-down"></i> 导出日志
+                            </button>
+                            <button id="duplicateLogBtn" class="btn btn-secondary">
+                                <i class="bi bi-files"></i> 复制日志
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-5">
+                <div class="card sticky-top" style="top: 20px;">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-phone"></i> 操作可视化</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="phone-screen" id="phoneScreen">
+                            <!-- 操作可视化将在这里显示 -->
+                        </div>
+                        <div class="text-center mt-3">
+                            <p class="text-muted">选择左侧时间线中的操作以在屏幕上显示</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 保存确认模态框 -->
+    <div class="modal fade" id="saveConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: var(--light-bg); color: var(--text-color); border: 1px solid var(--accent-color);">
+                <div class="modal-header" style="border-bottom-color: rgba(0, 229, 255, 0.2);">
+                    <h5 class="modal-title neon-text"><i class="bi bi-save"></i> 保存修改</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>确定要保存对操作日志的所有修改吗？这将覆盖原始日志文件。</p>
+                </div>
+                <div class="modal-footer" style="border-top-color: rgba(0, 229, 255, 0.2);">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-success" id="confirmSaveBtn">确认保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // 存储日志数据的变量
+        let logData = {{ log_data|tojson }};
+        let hasChanges = false;
+        
+        $(document).ready(function() {
+            // 清除屏幕上的所有操作显示
+            function clearPhoneScreen() {
+                $('#phoneScreen').empty();
+            }
+            
+            // 显示点击操作
+            function showTapAction(x, y) {
+                clearPhoneScreen();
+                
+                // 手机屏幕尺寸
+                const screenWidth = 300;
+                const screenHeight = 600;
+                
+                // 原始屏幕尺寸 (假设是1080x1920)
+                const originalWidth = 1080;
+                const originalHeight = 1920;
+                
+                // 计算缩放后的坐标
+                const scaledX = (x / originalWidth) * screenWidth;
+                const scaledY = (y / originalHeight) * screenHeight;
+                
+                // 创建点击点
+                const tapPoint = $('<div class="tap-point"></div>');
+                tapPoint.css({
+                    'left': scaledX + 'px',
+                    'top': scaledY + 'px'
+                });
+                
+                $('#phoneScreen').append(tapPoint);
+            }
+            
+            // 显示滑动操作
+            function showSwipeAction(startX, startY, endX, endY) {
+                clearPhoneScreen();
+                
+                // 手机屏幕尺寸
+                const screenWidth = 300;
+                const screenHeight = 600;
+                
+                // 原始屏幕尺寸 (假设是1080x1920)
+                const originalWidth = 1080;
+                const originalHeight = 1920;
+                
+                // 计算缩放后的坐标
+                const scaledStartX = (startX / originalWidth) * screenWidth;
+                const scaledStartY = (startY / originalHeight) * screenHeight;
+                const scaledEndX = (endX / originalWidth) * screenWidth;
+                const scaledEndY = (endY / originalHeight) * screenHeight;
+                
+                // 计算线的长度和角度
+                const length = Math.sqrt(Math.pow(scaledEndX - scaledStartX, 2) + Math.pow(scaledEndY - scaledStartY, 2));
+                const angle = Math.atan2(scaledEndY - scaledStartY, scaledEndX - scaledStartX) * (180 / Math.PI);
+                
+                // 创建滑动线
+                const swipeLine = $('<div class="swipe-line"></div>');
+                swipeLine.css({
+                    'left': scaledStartX + 'px',
+                    'top': scaledStartY + 'px',
+                    'width': length + 'px',
+                    'height': '4px',
+                    'transform': 'rotate(' + angle + 'deg)',
+                    'transform-origin': '0 0'
+                });
+                
+                // 创建箭头
+                const swipeArrow = $('<div class="swipe-arrow"></div>');
+                swipeArrow.css({
+                    'left': scaledEndX + 'px',
+                    'top': scaledEndY + 'px',
+                    'transform': 'translate(-50%, -50%) rotate(' + (angle + 90) + 'deg)'
+                });
+                
+                $('#phoneScreen').append(swipeLine, swipeArrow);
+            }
+            
+            // 监听展示操作按钮
+            $('.show-action').click(function() {
+                const actionType = $(this).data('action-type');
+                
+                if (actionType === 'tap') {
+                    const x = $(this).data('x');
+                    const y = $(this).data('y');
+                    showTapAction(x, y);
+                } else if (actionType === 'swipe') {
+                    const startX = $(this).data('start-x');
+                    const startY = $(this).data('start-y');
+                    const endX = $(this).data('end-x');
+                    const endY = $(this).data('end-y');
+                    showSwipeAction(startX, startY, endX, endY);
+                }
+            });
+            
+            // 编辑操作参数
+            $('.edit-action').click(function() {
+                const actionIndex = $(this).data('action-index');
+                $(`#params-display-${actionIndex}`).addClass('d-none');
+                $(`#params-edit-${actionIndex}`).removeClass('d-none');
+            });
+            
+            // 取消编辑
+            $('.cancel-edit').click(function() {
+                const actionIndex = $(this).data('action-index');
+                $(`#params-edit-${actionIndex}`).addClass('d-none');
+                $(`#params-display-${actionIndex}`).removeClass('d-none');
+            });
+            
+            // 保存参数
+            $('.save-params').click(function() {
+                const actionIndex = $(this).data('action-index');
+                const actionType = logData[actionIndex].action_type.toLowerCase();
+                
+                // 收集参数值
+                const newParams = {};
+                $(`#params-edit-${actionIndex} .param-value`).each(function() {
+                    const param = $(this).data('param');
+                    let value = $(this).val();
+                    
+                    // 对数字类型参数进行转换
+                    if (param === 'x' || param === 'y' || param === 'start_x' || param === 'start_y' || 
+                        param === 'end_x' || param === 'end_y') {
+                        value = parseInt(value);
+                    }
+                    
+                    newParams[param] = value;
+                });
+                
+                // 保留原有的wait_time参数
+                if (logData[actionIndex].params.wait_time) {
+                    newParams.wait_time = logData[actionIndex].params.wait_time;
+                }
+                
+                // 更新logData
+                logData[actionIndex].params = newParams;
+                hasChanges = true;
+                
+                // 更新显示
+                updateDisplayForAction(actionIndex);
+                
+                // 隐藏编辑表单
+                $(`#params-edit-${actionIndex}`).addClass('d-none');
+                $(`#params-display-${actionIndex}`).removeClass('d-none');
+            });
+            
+            // 更新指定操作的显示
+            function updateDisplayForAction(actionIndex) {
+                const action = logData[actionIndex];
+                const actionType = action.action_type.toLowerCase();
+                const $display = $(`#params-display-${actionIndex}`);
+                
+                $display.empty();
+                
+                if (actionType === 'tap') {
+                    $display.append(`<p>坐标: (${action.params.x}, ${action.params.y})</p>`);
+                    $display.append(`
+                        <button class="btn btn-sm btn-outline-success show-action" 
+                                data-action-type="tap" 
+                                data-x="${action.params.x}" 
+                                data-y="${action.params.y}">
+                            <i class="bi bi-eye"></i> 在屏幕上显示
+                        </button>
+                    `);
+                } else if (actionType === 'swipe') {
+                    $display.append(`<p>起点: (${action.params.start_x}, ${action.params.start_y})</p>`);
+                    $display.append(`<p>终点: (${action.params.end_x}, ${action.params.end_y})</p>`);
+                    $display.append(`
+                        <button class="btn btn-sm btn-outline-primary show-action" 
+                                data-action-type="swipe" 
+                                data-start-x="${action.params.start_x}" 
+                                data-start-y="${action.params.start_y}"
+                                data-end-x="${action.params.end_x}" 
+                                data-end-y="${action.params.end_y}">
+                            <i class="bi bi-eye"></i> 在屏幕上显示
+                        </button>
+                    `);
+                } else if (actionType === 'type') {
+                    $display.append(`<p>输入文本: "${action.params.text}"</p>`);
+                } else if (actionType === 'open app') {
+                    $display.append(`<p>打开应用: ${action.params.app_name}</p>`);
+                    $display.append(`<p>点击坐标: (${action.params.x}, ${action.params.y})</p>`);
+                }
+                
+                // 重新绑定事件处理程序
+                $display.find('.show-action').click(function() {
+                    const actionType = $(this).data('action-type');
+                    
+                    if (actionType === 'tap') {
+                        const x = $(this).data('x');
+                        const y = $(this).data('y');
+                        showTapAction(x, y);
+                    } else if (actionType === 'swipe') {
+                        const startX = $(this).data('start-x');
+                        const startY = $(this).data('start-y');
+                        const endX = $(this).data('end-x');
+                        const endY = $(this).data('end-y');
+                        showSwipeAction(startX, startY, endX, endY);
+                    }
+                });
+            }
+            
+            // 保存所有修改
+            $('#saveChangesBtn').click(function() {
+                if (hasChanges) {
+                    // 显示确认对话框
+                    $('#saveConfirmModal').modal('show');
+                } else {
+                    alert('没有需要保存的修改');
+                }
+            });
+            
+            // 确认保存
+            $('#confirmSaveBtn').click(function() {
+                // 发送AJAX请求保存修改后的日志数据
+                $.ajax({
+                    url: '/save_log_changes',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        log_path: '{{ log_name }}',
+                        log_data: logData
+                    }),
+                    success: function(response) {
+                        if (response.success) {
+                            alert('日志保存成功');
+                            hasChanges = false;
+                            $('#saveConfirmModal').modal('hide');
+                        } else {
+                            alert('保存失败: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('网络错误，请重试');
+                    }
+                });
+            });
+            
+            // 导出日志
+            $('#exportJsonBtn').click(function() {
+                // 创建一个带有日志数据的blob
+                const blob = new Blob([JSON.stringify(logData, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                
+                // 创建一个临时链接并触发下载
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '{{ log_name }}';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            // 复制日志
+            $('#duplicateLogBtn').click(function() {
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                const newLogName = `log_copy_${timestamp}.json`;
+                
+                $.ajax({
+                    url: '/duplicate_log',
+                    method: 'POST',
+                    data: {
+                        source_log: '{{ log_name }}',
+                        new_log_name: newLogName
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert(`日志已复制为: ${newLogName}`);
+                            // 刷新页面或重定向到新日志
+                            window.location.href = `/view_log/${newLogName}`;
+                        } else {
+                            alert('复制失败: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('网络错误，请重试');
+                    }
+                });
+            });
+            
+            // 重放操作
+            $('#replayBtn').click(function() {
+                const logName = '{{ log_name }}';
+                
+                $.ajax({
+                    url: '/start_replay',
+                    method: 'POST',
+                    data: {
+                        log_file: logName
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            window.location.href = '/';
+                        } else {
+                            alert('启动重放失败: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('网络错误，请重试');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

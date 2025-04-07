@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统配置 - MobileAgent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #1E88E5;
+            --primary-dark: #1565C0;
+            --secondary-color: #7E57C2;
+            --accent-color: #00E5FF;
+            --dark-bg: #121212;
+            --medium-bg: #1E1E1E;
+            --light-bg: #2D2D2D;
+            --text-color: #E0E0E0;
+            --border-glow: 0 0 10px var(--accent-color);
+            --border-radius: 12px;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(30, 136, 229, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 229, 255, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+        
+        .navbar {
+            background-color: var(--medium-bg) !important;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            color: var(--accent-color) !important;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+        
+        .nav-link {
+            color: var(--text-color) !important;
+            margin: 0 5px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--accent-color) !important;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        
+        .card {
+            background-color: var(--light-bg);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), var(--border-glow);
+            border-color: var(--accent-color);
+        }
+        
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 15px 20px;
+            border-top-left-radius: var(--border-radius) !important;
+            border-top-right-radius: var(--border-radius) !important;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            color: var(--accent-color);
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .btn {
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            left: 0;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 15px rgba(30, 136, 229, 0.5);
+        }
+        
+        .form-control, .form-select {
+            background-color: var(--medium-bg);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: var(--text-color);
+            border-radius: var(--border-radius);
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(0, 229, 255, 0.05);
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            box-shadow: 0 0 0 0.25rem rgba(0, 229, 255, 0.25);
+        }
+        
+        .form-check-input {
+            background-color: var(--medium-bg);
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .form-label {
+            color: var(--text-color);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .section-title {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, var(--accent-color), transparent);
+        }
+        
+        .neon-text {
+            color: var(--accent-color);
+            text-shadow: 0 0 5px var(--accent-color), 
+                         0 0 10px var(--accent-color), 
+                         0 0 20px var(--accent-color);
+        }
+        
+        .config-section {
+            position: relative;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 2px solid var(--accent-color);
+            background-color: rgba(0, 229, 255, 0.03);
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-phone"></i> MobileAgent<span class="neon-text">OS</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">主控台</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('config_page') }}">系统配置</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4 neon-text"><i class="bi bi-sliders"></i> 系统参数配置</h2>
+        
+        <form method="post" action="{{ url_for('config_page') }}">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gear-fill"></i> 基础设置</h5>
+                </div>
+                <div class="card-body">
+                    <div class="config-section">
+                        <h5 class="section-title"><i class="bi bi-phone"></i> 设备连接</h5>
+                        <div class="mb-3">
+                            <label for="adb_path" class="form-label">ADB路径</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--medium-bg); border-color: rgba(0, 229, 255, 0.2); color: var(--accent-color);">
+                                    <i class="bi bi-terminal"></i>
+                                </span>
+                                <input type="text" class="form-control" id="adb_path" name="adb_path" value="{{ config.adb_path }}" required>
+                            </div>
+                            <div class="form-text text-light opacity-75">Android Debug Bridge工具的路径</div>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h5 class="section-title"><i class="bi bi-robot"></i> AI 控制</h5>
+                        <div class="mb-3">
+                            <label for="instruction" class="form-label">执行指令</label>
+                            <textarea class="form-control" id="instruction" name="instruction" rows="3" required>{{ config.instruction }}</textarea>
+                            <div class="form-text text-light opacity-75">要执行的任务指令描述</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="add_info" class="form-label">附加信息</label>
+                            <textarea class="form-control" id="add_info" name="add_info" rows="3">{{ config.add_info }}</textarea>
+                            <div class="form-text text-light opacity-75">提供给AI的附加信息和指示</div>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h5 class="section-title"><i class="bi bi-key"></i> API 配置</h5>
+                        <div class="mb-3">
+                            <label for="API_url" class="form-label">API URL</label>
+                            <input type="url" class="form-control" id="API_url" name="API_url" value="{{ config.API_url }}" required>
+                            <div class="form-text text-light opacity-75">OpenAI API地址</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="token" class="form-label">OpenAI API 密钥</label>
+                            <input type="password" class="form-control" id="token" name="token" value="{{ config.token }}">
+                            <div class="form-text text-light opacity-75">访问OpenAI API的密钥</div>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h5 class="section-title"><i class="bi bi-camera"></i> 图像标注设置</h5>
+                        <div class="mb-3">
+                            <label for="caption_call_method" class="form-label">标注调用方式</label>
+                            <select class="form-select" id="caption_call_method" name="caption_call_method">
+                                <option value="local" {% if config.caption_call_method == "local" %}selected{% endif %}>本地处理</option>
+                                <option value="api" {% if config.caption_call_method == "api" %}selected{% endif %}>API调用</option>
+                            </select>
+                            <div class="form-text text-light opacity-75">图像标注的处理方式</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="caption_model" class="form-label">标注模型</label>
+                            <select class="form-select" id="caption_model" name="caption_model">
+                                <option value="qwen-vl-chat" {% if config.caption_model == "qwen-vl-chat" %}selected{% endif %}>Qwen-VL-Chat</option>
+                                <option value="qwen-vl-chat-int4" {% if config.caption_model == "qwen-vl-chat-int4" %}selected{% endif %}>Qwen-VL-Chat-Int4</option>
+                                <option value="qwen-vl-plus" {% if config.caption_model == "qwen-vl-plus" %}selected{% endif %}>Qwen-VL-Plus</option>
+                            </select>
+                            <div class="form-text text-light opacity-75">使用的图像标注模型</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="qwen_api" class="form-label">Qwen API 密钥</label>
+                            <input type="password" class="form-control" id="qwen_api" name="qwen_api" value="{{ config.qwen_api }}">
+                            <div class="form-text text-light opacity-75">使用API方式时的Qwen API密钥</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-toggles"></i> 功能开关</h5>
+                </div>
+                <div class="card-body">
+                    <div class="config-section">
+                        <h5 class="section-title"><i class="bi bi-plugin"></i> 智能功能</h5>
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="reflection_switch" name="reflection_switch" {% if config.reflection_switch %}checked{% endif %}>
+                            <label class="form-check-label" for="reflection_switch">开启反思机制</label>
+                            <div class="form-text text-light opacity-75">AI执行操作后会进行自我反思和评估</div>
+                        </div>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="memory_switch" name="memory_switch" {% if config.memory_switch %}checked{% endif %}>
+                            <label class="form-check-label" for="memory_switch">开启记忆机制</label>
+                            <div class="form-text text-light opacity-75">AI会记住重要信息，提高任务连贯性</div>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h5 class="section-title"><i class="bi bi-save"></i> 操作记录</h5>
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="record_operations" name="record_operations" {% if config.record_operations %}checked{% endif %}>
+                            <label class="form-check-label" for="record_operations">记录操作步骤</label>
+                            <div class="form-text text-light opacity-75">将操作步骤记录到日志文件中</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="operations_log_file" class="form-label">操作日志文件</label>
+                            <input type="text" class="form-control" id="operations_log_file" name="operations_log_file" value="{{ config.operations_log_file }}">
+                            <div class="form-text text-light opacity-75">操作日志的保存文件名</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4 mb-5">
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary" style="border-color: rgba(255,255,255,0.2); color: var(--text-color);">
+                    <i class="bi bi-arrow-left"></i> 返回主控台
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> 保存配置
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 根据标注调用方式显示/隐藏相关选项
+            function updateCaptionOptions() {
+                const method = $("#caption_call_method").val();
+                if (method === "api") {
+                    $("#qwen_api").closest(".mb-3").show();
+                } else {
+                    $("#qwen_api").closest(".mb-3").hide();
+                }
+            }
+            
+            // 初始化时调用一次
+            updateCaptionOptions();
+            
+            // 当标注调用方式改变时
+            $("#caption_call_method").change(updateCaptionOptions);
+        });
+    </script>
+</body>
+</html> 
